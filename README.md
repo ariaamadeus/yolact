@@ -7,6 +7,8 @@
        ██║   ╚██████╔╝███████╗██║  ██║╚██████╗   ██║   
        ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝ 
 ```
+Modified for personal use. Thankyou for Daniel Bolya cs. ~ Aria
+
 A simple, fully convolutional model for real-time instance segmentation. This is the code for our papers:
  - [YOLACT: Real-time Instance Segmentation](https://arxiv.org/abs/1904.02689)
  - [YOLACT++: Better Real-time Instance Segmentation](https://arxiv.org/abs/1912.06218)
