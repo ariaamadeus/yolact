@@ -172,9 +172,14 @@ pascal_sbd_dataset = dataset_base.copy({
     'class_names': PASCAL_CLASSES,
 })
 
-
-
-
+kelapa_sawit_dataset = dataset_base.copy({
+  'name': 'Emmerich Research Center - Kelapa Sawit',
+  'train_info': './data/KelapaSawit/KelapaSet/KelapaAnnotation.json',
+  'train_images': './data/KelapaSawit/KelapaSet/ImageKelapa/',
+  'valid_info': './data/KelapaSawit/KelapaVal/KelapaAnnotationVal.json',
+  'valid_images': './data/KelapaSawit/KelapaVal/ImageKelapaVal/',
+  'class_names': ('FFB_Accept','FFB_Reject')
+})
 
 # ----------------------- TRANSFORMS ----------------------- #
 
@@ -767,6 +772,16 @@ yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
     })
 })
 
+yolact_resnet50_kelapa_sawit_config = yolact_resnet50_config.copy({
+    'name': 'yolact_plus_resnet50_kelapa_sawit',
+    # Dataset stuff
+    'dataset': kelapa_sawit_dataset,
+    'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
+
+    # Image Size
+    'max_size': 512,
+})
+
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
 
 yolact_plus_base_config = yolact_base_config.copy({
@@ -824,3 +839,4 @@ def set_dataset(dataset_name:str):
     """ Sets the dataset of the current config. """
     cfg.dataset = eval(dataset_name)
     
+
