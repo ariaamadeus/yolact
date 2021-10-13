@@ -20,6 +20,8 @@ import torch.utils.data as data
 import numpy as np
 import argparse
 import datetime
+import wandb
+wandb.login()
 
 # Oof
 import eval as eval_script
@@ -170,6 +172,7 @@ class CustomDataParallel(nn.DataParallel):
         return out
 
 def train():
+    global loss
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)
 
@@ -260,6 +263,8 @@ def train():
 
     print('Begin training!')
     print()
+    
+    wandb.init(project='TesKelapaSawit')
     # try-except so you can use ctrl+c to save early and stop training
     try:
         for epoch in range(num_epochs):
@@ -317,10 +322,15 @@ def train():
                 if torch.isfinite(loss).item():
                     optimizer.step()
                 
+                # Submit loss to wandb
+                
+                wandb.log({"Loss":loss.item()})
+                
+                
                 # Add the loss to the moving average for bookkeeping
                 for k in losses:
                     loss_avgs[k].add(losses[k].item())
-
+                
                 cur_time  = time.time()
                 elapsed   = cur_time - last_time
                 last_time = cur_time
@@ -477,7 +487,6 @@ def compute_validation_loss(net, data_loader, criterion):
         
         for k in losses:
             losses[k] /= iterations
-            
         
         loss_labels = sum([[k, losses[k]] for k in loss_types if k in losses], [])
         print(('Validation ||' + (' %s: %.3f |' * len(losses)) + ')') % tuple(loss_labels), flush=True)
@@ -485,16 +494,15 @@ def compute_validation_loss(net, data_loader, criterion):
 def compute_validation_map(epoch, iteration, yolact_net, dataset, log:Log=None):
     with torch.no_grad():
         yolact_net.eval()
-        
         start = time.time()
         print()
         print("Computing validation mAP (this may take a while)...", flush=True)
         val_info = eval_script.evaluate(yolact_net, dataset, train_mode=True)
         end = time.time()
-
+        
         if log is not None:
             log.log('val', val_info, elapsed=(end - start), epoch=epoch, iter=iteration)
-
+        
         yolact_net.train()
 
 def setup_eval():
@@ -502,3 +510,5 @@ def setup_eval():
 
 if __name__ == '__main__':
     train()
+
+
