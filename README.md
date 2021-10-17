@@ -8,6 +8,7 @@
        ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝ 
 ```
 Modified for personal use. Thankyou for Daniel Bolya cs. ~ Aria
+
 Yolact Tutorial: https://youtu.be/x9PZ1xjIkng
 
 A simple, fully convolutional model for real-time instance segmentation. This is the code for our papers:
