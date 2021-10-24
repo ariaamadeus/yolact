@@ -279,7 +279,7 @@ class PredictionModule(nn.Module):
                 self.last_conv_size = (conv_w, conv_h)
         
         return self.priors
-
+thefirst = True
 class FPN(ScriptModuleWrapper):
     """
     Implements a general version of the FPN introduced in
@@ -340,7 +340,12 @@ class FPN(ScriptModuleWrapper):
         # For backward compatability, the conv layers are stored in reverse but the input and output is
         # given in the correct order. Thus, use j=-i-1 for the input and output and i for the conv layers.
         j = len(convouts)
-        sizes = [(69, 69), (35, 35)]
+        if thefirst:
+            sizes = [(64, 64), (32, 32)]
+            thefirst = false
+        else:
+            sizes = [(69, 69), (35, 35)]
+            print("only 1 image accepted")
         for lat_layer in self.lat_layers:
             j -= 1
 
