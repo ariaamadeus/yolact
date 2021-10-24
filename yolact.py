@@ -346,7 +346,7 @@ class FPN(ScriptModuleWrapper):
             thefirst = False
         else:
             sizes = [(69, 69), (35, 35)]
-            print("only 1 image accepted")
+            print(".onnx generated\n Only 1 image accepted. You must be received an error message below :)")
         for lat_layer in self.lat_layers:
             j -= 1
 
