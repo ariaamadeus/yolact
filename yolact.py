@@ -343,7 +343,7 @@ class FPN(ScriptModuleWrapper):
         j = len(convouts)
         if thefirst:
             sizes = [(64, 64), (32, 32)]
-            thefirst = false
+            thefirst = False
         else:
             sizes = [(69, 69), (35, 35)]
             print("only 1 image accepted")
