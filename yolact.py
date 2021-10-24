@@ -325,6 +325,7 @@ class FPN(ScriptModuleWrapper):
 
     @script_method_wrapper
     def forward(self, convouts:List[torch.Tensor]):
+        global thefirst
         """
         Args:
             - convouts (list): A list of convouts for the corresponding layers in in_channels.
