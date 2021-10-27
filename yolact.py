@@ -279,9 +279,8 @@ class PredictionModule(nn.Module):
                 self.last_conv_size = (conv_w, conv_h)
         
         return self.priors
-    
-theBackbonE = ""
-thefirst = True
+
+thefirst = 0
 class FPN(ScriptModuleWrapper):
     """
     Implements a general version of the FPN introduced in
@@ -343,20 +342,26 @@ class FPN(ScriptModuleWrapper):
         # For backward compatability, the conv layers are stored in reverse but the input and output is
         # given in the correct order. Thus, use j=-i-1 for the input and output and i for the conv layers.
         j = len(convouts)
-        if theBackbonE == "weights/resnet50-19c8e357.pth":
-            if thefirst:
+        thepath = cfg.backbone.path
+        if thepath == "resnet50-19c8e357.pth":
+            if thefirst == 0:
                 sizes = [(64, 64), (32, 32)]
-                thefirst = False
+                thefirst += 1
+                print("config:",thepath)
             else:
                 sizes = [(69, 69), (35, 35)]
-                print(".onnx generated\n Only 1 image accepted. You must be received an error message below :)")
-        elif theBackbonE == "weights/darknet53.pth":
-            if thefirst:
+                print("yolact.onnx generated\n Only 1 image accepted. You must be received an error message below :)")
+        elif thepath == "darknet53.pth":
+            print('A')
+            if thefirst == 0:
                 sizes = [(69, 69), (35, 35)]
-                thefirst = False
+                thefirst += 1
+                print("config:",thepath)
+            elif thefirst == 1:
+                thefirst += 1
             else:
                 sizes = [(64, 64), (32, 32)]
-                print(".onnx generated\n Only 1 image accepted. You must be received an error message below :)")
+                print("yolact.onnx generated\n Only 1 image accepted. You must be received an error message below :)")
         for lat_layer in self.lat_layers:
             j -= 1
 
@@ -496,10 +501,8 @@ class Yolact(nn.Module):
         self.load_state_dict(state_dict)
 
     def init_weights(self, backbone_path):
-        global theBackbonE
         """ Initialize weights for training. """
         # Initialize the backbone with the pretrained weights.
-        theBackbonE = backbone_path
         self.backbone.init_backbone(backbone_path)
 
         # Initialize the rest of the conv layers with xavier
