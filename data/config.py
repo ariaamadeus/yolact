@@ -674,6 +674,18 @@ yolact_resnet50_kelapa_sawit_config = yolact_resnet50_config.copy({
     # Image Size
     'max_size': 512,
 })
+yolact_resnet101_kelapa_sawit_config = yolact_base_config.copy({
+    'name': 'yolact_plus_resnet101_kelapa_sawit',
+    # Dataset stuff
+    'dataset': kelapa_sawit_dataset,
+    'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
+})
+yolact_darknet53_kelapa_sawit_config = yolact_darknet53_config.copy({
+    'name': 'yolact_plus_darknet53_kelapa_sawit',
+    # Dataset stuff
+    'dataset': kelapa_sawit_dataset,
+    'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
+})
 
 # Default config
 cfg = yolact_base_config.copy()
