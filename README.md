@@ -7,8 +7,9 @@
        ██║   ╚██████╔╝███████╗██║  ██║╚██████╗   ██║   
        ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝ 
 ```
-Modified for personal use. Thankyou for Daniel Bolya cs. ~ Aria
+Modified for personal use. Thankyou for Daniel Bolya cs., Ma-Dan ~ Aria
 
+copied from https://github.com/Ma-Dan/yolact/tree/onnx
 Yolact Tutorial: https://youtu.be/x9PZ1xjIkng
 
 A simple, fully convolutional model for real-time instance segmentation. This is the code for our papers:
