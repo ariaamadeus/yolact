@@ -559,8 +559,9 @@ def badhash(x):
     x = (((x >> 16) ^ x) * 0x045d9f3b) & 0xFFFFFFFF
     x =  ((x >> 16) ^ x) & 0xFFFFFFFF
     return x
-
+thefirst1 = True
 def evalimage(net:Yolact, path:str, save_path:str=None):
+    global thefirst1
     frame = torch.from_numpy(cv2.imread(path)).float()
     batch = FastBaseTransform()(frame.unsqueeze(0))
     pred_outs = net(batch)
@@ -570,7 +571,9 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     preds = detect({'loc': pred_outs[0], 'conf': pred_outs[1], 'mask':pred_outs[2], 'priors': pred_outs[3], 'proto': pred_outs[4]})
 
     dummy_input = Variable(torch.randn(1, 3, 550, 550))
-    torch.onnx.export(net, dummy_input, "yolact.onnx", verbose=True)
+    if thefirst1:
+        torch.onnx.export(net, dummy_input, "yolact.onnx", verbose=True)
+        thefirst1 = False
 
     img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
     
