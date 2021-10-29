@@ -345,11 +345,14 @@ class FPN(ScriptModuleWrapper):
         thepath = cfg.backbone.path
         if thepath == "resnet50-19c8e357.pth":
             if thefirst == 0:
-                sizes = [(64, 64), (32, 32)]
+                sizes = [(69, 69), (35, 35)]
                 thefirst += 1
                 print("config:",thepath)
-            else:
+            elif thefirst == 1:
                 sizes = [(69, 69), (35, 35)]
+                thefirst += 1
+            else:
+                sizes = [(64, 64), (32, 32)]
                 print("yolact.onnx generated\n Only 1 image accepted. You must be received an error message below :)")
         elif thepath == "darknet53.pth":
             print('A')
@@ -358,6 +361,7 @@ class FPN(ScriptModuleWrapper):
                 thefirst += 1
                 print("config:",thepath)
             elif thefirst == 1:
+                sizes = [(69, 69), (35, 35)]
                 thefirst += 1
             else:
                 sizes = [(64, 64), (32, 32)]
