@@ -8,6 +8,10 @@
        ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝   ╚═╝ 
 ```
 
+Bakal banyak problem di install"an librarynya, aku coba rangkum apa aja masalahnya:
+- Pytorch for raspberry(armv7l): [Pytorch](https://drive.google.com/file/d/1D3A5YSWiY-EnRWzWbzSqvj4YdY90wuXq/view)
+- Loading model Killed raspberry pi 3(100%CPU Usage): tutup semua windows, kecuali terminal n folder explorer gamasalah.
+
 A simple, fully convolutional model for real-time instance segmentation. This is the code for [our paper](https://arxiv.org/abs/1904.02689), and for the forseeable future is still in development.
 
 Here's a look at our current results for our base model (33 fps on a Titan Xp and 29.8 mAP on COCO's `test-dev`):
