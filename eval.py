@@ -610,19 +610,38 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
         cv2.imwrite(save_path, img_numpy)
 
 def evalimages(net:Yolact, input_folder:str, output_folder:str):
-    if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+    while True:
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
 
-    print()
-    for p in Path(input_folder).glob('*'): 
-        path = str(p)
-        name = os.path.basename(path)
-        name = '.'.join(name.split('.')[:-1]) + '.png'
-        out_path = os.path.join(output_folder, name)
+        print()
+        for p in Path(input_folder).glob('*'):
+            path = str(p)
+            name = os.path.basename(path)
+            name = '.'.join(name.split('.')[:-1]) + '.png'
+            out_path = os.path.join(output_folder, name)
 
-        evalimage(net, path, out_path)
-        print(path + ' -> ' + out_path)
-    print('Done.')
+            evalimage(net, path, out_path)
+            print(path + ' -> ' + out_path)
+        print('Done')
+        while not againTrue:
+            again = input("New image?([y]/n)")
+            if again.isidentifier():
+                if again.casefold() == 'y' or again.casefold() == 'yes' or again == '':
+                    again = 'y'
+                    break
+                elif again.casefold() == 'n' or again.casefold() == 'no':
+                    again = 'n'
+                    break
+                else:
+                    continue
+            else:
+                continue
+        if again == 'y':
+            continue
+        else:
+            break
+    print('Closing.')
 
 from multiprocessing.pool import ThreadPool
 from queue import Queue
