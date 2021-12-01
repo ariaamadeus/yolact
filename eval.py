@@ -624,7 +624,7 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             evalimage(net, path, out_path)
             print(path + ' -> ' + out_path)
         print('Done')
-        while not againTrue:
+        while True:
             again = input("New image?([y]/n)")
             if again.isidentifier():
                 if again.casefold() == 'y' or again.casefold() == 'yes' or again == '':
