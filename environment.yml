@@ -11,11 +11,11 @@ channels:
   - pytorch
   - defaults
 dependencies:
-  - python==3.7
+  - python==3.8
   - pip
-  - cython 
+  - cython
   - pytorch::torchvision
-  - pytorch::pytorch >=1.0.1
+  - pytorch::pytorch >=1.0.0
   - cudatoolkit
   - cudnn
   - pytorch::cuda100
