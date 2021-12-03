@@ -66,13 +66,15 @@ while running:
         cv2.imwrite((os.getcwd()+'/test_images/img.png'),cameraFeed)
         os.system("python3.7 eval.py --trained_model=weights/yolact_plus_resnet50_kelapa_sawit_77_544_interrupt.pth --config=yolact_resnet50_kelapa_sawit_config --cuda=False --score_threshold=0.5 --top_k=1  --images=test_images:output_image")
         # Create a window for display.
-        cv2.namedWindow("server");
-        cv2.imshow("server", cameraFeed)
-        key = cv2.waitKey(30)
-        running = key
+        #cv2.namedWindow("server");
+        #cv2.imshow("server", cameraFeed)
+        #key = cv2.waitKey(30)
+        #running = key
 
         # esc
-        if key==27:
-            running =False
+        #if key==27:
+        #    running =False
+        # Terima 1 foto
+        running = False
     else : running =False
 conn.close()
