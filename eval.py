@@ -641,7 +641,7 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             continue
         else:
             break
-    print('Closing.')
+    print('Closing...')
 
 from multiprocessing.pool import ThreadPool
 from queue import Queue
