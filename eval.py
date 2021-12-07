@@ -234,7 +234,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
                 cv2.rectangle(img_numpy, (x1, y1), (x1 + text_w, y1 - text_h - 4), color, -1)
                 cv2.putText(img_numpy, text_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
     
-    return img_numpy
+    return img_numpy, classes, scores, boxes
 
 def prep_benchmark(dets_out, h, w):
     with timer.env('Postprocess'):
@@ -561,23 +561,36 @@ def badhash(x):
     x =  ((x >> 16) ^ x) & 0xFFFFFFFF
     return x
 
-def evalimage(net:Yolact, path:str, save_path:str=None):
+globclasses = []
+globscores = []
+globboxes = []
+
+def evalimage(net:Yolact, camFeed, save_path:str=None):
+#def evalimage(net:Yolact, path:str, save_path:str=None):
+    global globclasses
+    global globscores
+    global globboxes
     save_path_p = "/home/pi/Documents/yolact/output_images"
-    frame = torch.from_numpy(cv2.imread(path))
+    frame = torch.from_numpy(camFeed)
+    #frame = torch.from_numpy(cv2.imread(path))
     if torch.cuda.is_available():
         frame = frame.cuda()
     frame = frame.float()
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
-
-    img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
+    img_numpy, classes, scores, boxes = prep_display(preds, frame, None, None, undo_transform=False)
+    globclasses.append(classes)
+    globscores.append(scores)
+    globboxes.append(boxes)
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
 
     if save_path is None:
-        cv2.imwrite(save_path_p, img_numpy)
+        pass
+        #cv2.imwrite('output_images', img_numpy)
     else:
         cv2.imwrite(save_path, img_numpy)
+    return classes, scores, boxes
 
 def evalimages(net:Yolact, input_folder:str, output_folder:str):
     if not os.path.exists(output_folder):
@@ -793,7 +806,10 @@ def savevideo(net:Yolact, in_path:str, out_path:str):
 def evaluate(net:Yolact, dataset, train_mode=False):
     net.detect.use_fast_nms = args.fast_nms
     cfg.mask_proto_debug = args.mask_proto_debug
-
+    #edit
+    evalimage(net, args.image)
+    return
+    #edit
     if args.image is not None:
         if ':' in args.image:
             inp, out = args.image.split(':')
@@ -923,6 +939,7 @@ def evaluate(net:Yolact, dataset, train_mode=False):
 
     except KeyboardInterrupt:
         print('Stopping...')
+    return classes, scores, boxes
 
 
 def calc_map(ap_data):
@@ -963,7 +980,95 @@ def print_maps(all_maps):
     print(make_sep(len(all_maps['box']) + 1))
     print()
 
+net = 0
+dataset = 0
+#def theInit(trained_model, config, score_threshold, top_k, cuda = False):
+def theInit(trained_model, config, cuda = False):
+    global net, dataset
+    
+    parse_args()
+    args.trained_model = trained_model
+    args.config = config
+    #args.score_threshold = score_threshold
+    #args.top_k = top_k
+    #args.image = image
+    args.cuda = cuda
+    if args.config is not None:
+        set_cfg(args.config)
 
+    if args.trained_model == 'interrupt':
+        args.trained_model = SavePath.get_interrupt('weights/')
+    elif args.trained_model == 'latest':
+        args.trained_model = SavePath.get_latest('weights/', cfg.name)
+
+    if args.config is None:
+        model_path = SavePath.from_str(args.trained_model)
+        # TODO: Bad practice? Probably want to do a name lookup instead.
+        args.config = model_path.model_name + '_config'
+        print('Config not specified. Parsed %s from the file name.\n' % args.config)
+        set_cfg(args.config)
+
+    if args.detect:
+        cfg.eval_mask_branch = False
+
+    if args.dataset is not None:
+        set_dataset(args.dataset)
+
+    with torch.no_grad():
+        if not os.path.exists('results'):
+            os.makedirs('results')
+
+        if args.cuda:
+            cudnn.benchmark = True
+            cudnn.fastest = True
+            torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        else:
+            torch.set_default_tensor_type('torch.FloatTensor')
+
+        if args.resume and not args.display:
+            with open(args.ap_data_file, 'rb') as f:
+                ap_data = pickle.load(f)
+            calc_map(ap_data)
+            exit()
+
+        #if args.image is None and args.video is None and args.images is None:
+        dataset = COCODetection(cfg.dataset.valid_images, cfg.dataset.valid_info,
+                                transform=BaseTransform(), has_gt=cfg.dataset.has_gt)
+        prep_coco_cats()
+        #else:
+            #dataset = None        
+
+        print('Loading model...', end='')
+        net = Yolact()
+        map_location = None if args.cuda else 'cpu'
+        net.load_weights(args.trained_model, map_location=map_location)
+        net.eval()
+        net.detect.use_fast_nms = args.fast_nms
+        cfg.mask_proto_debug = args.mask_proto_debug
+        print(' Done.')
+        
+#def outEval(trained_model, config, score_threshold, top_k, image, cuda = False):
+def outEval(score_threshold, top_k, image, cuda = False):
+    global globclasses, globscores, globboxes, net, dataset
+    s_t =time.time()
+    parse_args()
+    #rgs.trained_model = trained_model
+    #args.config = config
+    args.score_threshold = score_threshold
+    args.top_k = top_k
+    args.image = image
+    args.cuda = cuda
+    with torch.no_grad():
+        
+        if args.cuda:
+            net = net.cuda()
+
+        globclasses = []
+        globscores = []
+        globboxes = []
+        evalimage(net, args.image)
+    print("time_taken",time.time()-s_t)
+    return globclasses, globscores, globboxes
 
 if __name__ == '__main__':
     s_t =time.time()
