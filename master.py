@@ -1,12 +1,9 @@
-import time
 import os
 import torch
 import json
 
-#from data import cfg, set_cfg, set_dataset
 import socket_server as ss #starServer(HOST, PORT), sendServer("message")
 import eval
-import time
 
 HOST = "192.168.5.71"
 PORT = 7002
