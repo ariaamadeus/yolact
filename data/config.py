@@ -54,8 +54,11 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   62: 57, 63: 58, 64: 59, 65: 60, 67: 61, 70: 62, 72: 63, 73: 64,
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
-
-
+KELAPA_MAP = COCO_LABEL_MAP
+for x in COCO_LABEL_MAP.keys():
+  KELAPA_MAP[x] += 4 
+for x in range(92,97):
+  KELAPA_MAP[x] = x-91
 
 # ----------------------- CONFIG CLASS ----------------------- #
 
@@ -188,7 +191,8 @@ kelapa_sawit_2_dataset = dataset_base.copy({
   'train_images': './data/KelapaSawit2/KelapaSet/ImageKelapa/',
   'valid_info': './data/KelapaSawit2/KelapaVal/KelapaAnnotationVal.json',
   'valid_images': './data/KelapaSawit2/KelapaVal/ImageKelapaVal/',
-  'class_names': ('FFB_Accept','FFB_Med_High','FFB_Med_Low','FFB_Reject')
+  'class_names': COCO_CLASSES+('FFB_Accept','FFB_Med_High','FFB_Med_Low','FFB_Reject'),
+  'label_map': KELAPA_MAP
 })
 
 # ----------------------- TRANSFORMS ----------------------- #
@@ -270,6 +274,14 @@ resnet101_dcn_inter3_backbone = resnet101_backbone.copy({
 resnet50_backbone = resnet101_backbone.copy({
     'name': 'ResNet50',
     'path': 'resnet50-19c8e357.pth',
+    'type': ResNetBackbone,
+    'args': ([3, 4, 6, 3],),
+    'transform': resnet_transform,
+})
+
+resnet50_Kelapa_backbone = resnet101_backbone.copy({
+    'name': 'ResNet50',
+    'path': 'yolact_resnet50_54_800000.pth',
     'type': ResNetBackbone,
     'args': ([3, 4, 6, 3],),
     'transform': resnet_transform,
@@ -765,6 +777,20 @@ yolact_resnet50_config = yolact_base_config.copy({
     }),
 })
 
+yolact_resnet50_Kelapa_config = yolact_base_config.copy({
+    'name': 'yolact_resnet50',
+
+    'backbone': resnet50_Kelapa_backbone.copy({
+        'selected_layers': list(range(1, 4)),
+        
+        'pred_scales': yolact_base_config.backbone.pred_scales,
+        'pred_aspect_ratios': yolact_base_config.backbone.pred_aspect_ratios,
+        'use_pixel_scales': True,
+        'preapply_sqrt': False,
+        'use_square_anchors': True, # This is for backward compatability with a bug
+    }),
+})
+
 
 yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
     'name': None, # Will default to yolact_resnet50_pascal
@@ -804,7 +830,7 @@ yolact_darknet53_kelapa_sawit_config = yolact_darknet53_config.copy({
     'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
 })
 
-yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_config.copy({
+yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_Kelapa_config.copy({
     'name': 'yolact_plus_resnet50_kelapa_sawit_2',
     # Dataset stuff
     'dataset': kelapa_sawit_2_dataset,
@@ -870,5 +896,3 @@ def set_cfg(config_name:str):
 def set_dataset(dataset_name:str):
     """ Sets the dataset of the current config. """
     cfg.dataset = eval(dataset_name)
-    
-
