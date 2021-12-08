@@ -182,6 +182,15 @@ kelapa_sawit_dataset = dataset_base.copy({
   'class_names': ('FFB_Accept','FFB_Reject')
 })
 
+kelapa_sawit_2_dataset = dataset_base.copy({
+  'name': 'Emmerich Research Center - Kelapa Sawit 2',
+  'train_info': './data/KelapaSawit2/KelapaSet/KelapaAnnotation.json',
+  'train_images': './data/KelapaSawit2/KelapaSet/ImageKelapa/',
+  'valid_info': './data/KelapaSawit2/KelapaVal/KelapaAnnotationVal.json',
+  'valid_images': './data/KelapaSawit2/KelapaVal/ImageKelapaVal/',
+  'class_names': ('FFB_Accept','FFB_Med_High','FFB_Med_Low','FFB_Reject')
+})
+
 # ----------------------- TRANSFORMS ----------------------- #
 
 resnet_transform = Config({
@@ -793,6 +802,16 @@ yolact_darknet53_kelapa_sawit_config = yolact_darknet53_config.copy({
     # Dataset stuff
     'dataset': kelapa_sawit_dataset,
     'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
+})
+
+yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_config.copy({
+    'name': 'yolact_plus_resnet50_kelapa_sawit_2',
+    # Dataset stuff
+    'dataset': kelapa_sawit_2_dataset,
+    'num_classes': len(kelapa_sawit_2_dataset.class_names) + 1,
+
+    # Image Size
+    'max_size': 512,
 })
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
