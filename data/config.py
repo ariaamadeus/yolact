@@ -830,7 +830,7 @@ yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_config.copy({
     'num_classes': len(kelapa_sawit_2_dataset.class_names) + 1,
 
     # Image Size
-    'max_size': 512,
+    'max_size': 550,
 })
 
 yolact_resnet50_kelapa_sawit_3_config = yolact_resnet50_config.copy({
@@ -840,7 +840,7 @@ yolact_resnet50_kelapa_sawit_3_config = yolact_resnet50_config.copy({
     'num_classes': len(kelapa_sawit_3_dataset.class_names) + 1,
 
     # Image Size
-    'max_size': 512,
+    'max_size': 550,
 })
 
 
