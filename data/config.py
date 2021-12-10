@@ -193,6 +193,16 @@ kelapa_sawit_2_dataset = dataset_base.copy({
   'label_map': KELAPA_MAP
 })
 
+kelapa_sawit_3_dataset = dataset_base.copy({
+  'name': 'Emmerich Research Center - Kelapa Sawit 3',
+  'train_info': './data/KelapaSawit3/KelapaSet/KelapaAnnotation.json',
+  'train_images': './data/KelapaSawit3/KelapaSet/ImageKelapa/',
+  'valid_info': './data/KelapaSawit3/KelapaVal/KelapaAnnotationVal.json',
+  'valid_images': './data/KelapaSawit2/KelapaVal/ImageKelapaVal/',
+  'class_names': ('FFB_Accept','FFB_Med_High','FFB_Med_Low','FFB_Reject')
+})
+
+
 # ----------------------- TRANSFORMS ----------------------- #
 
 resnet_transform = Config({
@@ -277,13 +287,13 @@ resnet50_backbone = resnet101_backbone.copy({
     'transform': resnet_transform,
 })
 
-resnet50_Kelapa_backbone = resnet101_backbone.copy({
-    'name': 'ResNet50',
-    'path': 'yolact_resnet50_54_800000.pth',
-    'type': ResNetBackbone,
-    'args': ([3, 4, 6, 3],),
-    'transform': resnet_transform,
-})
+#resnet50_Kelapa_backbone = resnet101_backbone.copy({
+#    'name': 'ResNet50',
+#    'path': 'yolact_resnet50_54_800000.pth',
+#    'type': ResNetBackbone,
+#    'args': ([3, 4, 6, 3],),
+#    'transform': resnet_transform,
+#})
 
 resnet50_dcnv2_backbone = resnet50_backbone.copy({
     'name': 'ResNet50_DCNv2',
@@ -775,21 +785,6 @@ yolact_resnet50_config = yolact_base_config.copy({
     }),
 })
 
-yolact_resnet50_Kelapa_config = yolact_base_config.copy({
-    'name': 'yolact_resnet50',
-
-    'backbone': resnet50_Kelapa_backbone.copy({
-        'selected_layers': list(range(1, 4)),
-        
-        'pred_scales': yolact_base_config.backbone.pred_scales,
-        'pred_aspect_ratios': yolact_base_config.backbone.pred_aspect_ratios,
-        'use_pixel_scales': True,
-        'preapply_sqrt': False,
-        'use_square_anchors': True, # This is for backward compatability with a bug
-    }),
-})
-
-
 yolact_resnet50_pascal_config = yolact_resnet50_config.copy({
     'name': None, # Will default to yolact_resnet50_pascal
     
@@ -828,7 +823,7 @@ yolact_darknet53_kelapa_sawit_config = yolact_darknet53_config.copy({
     'num_classes': len(kelapa_sawit_dataset.class_names) + 1,
 })
 
-yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_Kelapa_config.copy({
+yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_config.copy({
     'name': 'yolact_plus_resnet50_kelapa_sawit_2',
     # Dataset stuff
     'dataset': kelapa_sawit_2_dataset,
@@ -837,6 +832,17 @@ yolact_resnet50_kelapa_sawit_2_config = yolact_resnet50_Kelapa_config.copy({
     # Image Size
     'max_size': 512,
 })
+
+yolact_resnet50_kelapa_sawit_3_config = yolact_resnet50_config.copy({
+    'name': 'yolact_plus_resnet50_kelapa_sawit_3',
+    # Dataset stuff
+    'dataset': kelapa_sawit_3_dataset,
+    'num_classes': len(kelapa_sawit_3_dataset.class_names) + 1,
+
+    # Image Size
+    'max_size': 512,
+})
+
 
 # ----------------------- YOLACT++ CONFIGS ----------------------- #
 
