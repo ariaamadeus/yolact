@@ -277,7 +277,7 @@ class FPN(ScriptModuleWrapper):
         - in_channels (list): For each conv layer you supply in the forward pass,
                               how many features will it have?
     """
-    __constants__ = ['interpolation_mode', 'num_downsample', 'use_conv_downsample', 'relu_pred_layers',
+    __constants__ = ['interpolation_mode', 'num_downsample', 'use_conv_downsample', 'relu_',
                      'lat_layers', 'pred_layers', 'downsample_layers', 'relu_downsample_layers']
 
     def __init__(self, in_channels):
@@ -628,7 +628,7 @@ class Yolact(nn.Module):
                 if cfg.share_prediction_module and pred_layer is not self.prediction_layers[0]:
                     pred_layer.parent = [self.prediction_layers[0]]
 
-                p = pred_layer(pred_x)
+                p = pred_layer(pred_x.detach())
                 
                 for k, v in p.items():
                     pred_outs[k].append(v)
