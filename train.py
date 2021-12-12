@@ -500,6 +500,10 @@ def compute_validation_map(epoch, iteration, yolact_net, dataset, log:Log=None):
         val_info = eval_script.evaluate(yolact_net, dataset, train_mode=True)
         end = time.time()
         
+        # Submit mAP to wandb
+        wandb.log({"Box":val_info['box']['all']})
+        wandb.log({"Mask":val_info['mask']['all']})
+        
         if log is not None:
             log.log('val', val_info, elapsed=(end - start), epoch=epoch, iter=iteration)
         
