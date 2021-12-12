@@ -25,6 +25,7 @@ wandb.login()
 
 # Oof
 import eval as eval_script
+val_info = {'box':{'all':0},'mask':{'all':0}}
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
