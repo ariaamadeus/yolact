@@ -71,6 +71,11 @@ TACO_CLASSES = ("Aluminium foil", "Battery", "Aluminium blister pack",
                 "Rope & strings", "Scrap metal", "Shoe", "Squeezable tube", "Plastic straw", 
                 "Paper straw", "Styrofoam piece", "Unlabeled litter", "Cigarette")
 
+TACO_CLASSES_2 = ("Other plastic bottle", "Clear plastic botte", "Disposable plastic cup", 
+                  "Disposable food container", "Other plastic container")
+
+TACO_CLASSES_2_MAP = {4: 1, 5: 2, 21: 3, 45: 4, 47: 5}
+
 KELAPA_MAP = COCO_LABEL_MAP
 for x in range(1,5):
   KELAPA_MAP[x+91] = x+80
@@ -228,6 +233,15 @@ taco_dataset = dataset_base.copy({
   'class_names': TACO_CLASSES
 })
 
+taco_2_dataset = dataset_base.copy({
+  'name': 'Emmerich Research Center - TACO2',
+  'train_info': '/content/TACO/data/annotations_0_train.json',
+  'train_images': '/content/TACO/data',
+  'valid_info': '/content/TACO/data/annotations_0_val.json',
+  'valid_images': '/content/TACO/data',
+  'class_names': TACO_CLASSES_2,
+  'label_map': TACO_CLASSES_2_MAP
+})
 
 
 # ----------------------- TRANSFORMS ----------------------- #
@@ -875,6 +889,16 @@ yolact_resnet50_taco_config = yolact_resnet50_config.copy({
     # Dataset stuff
     'dataset': taco_dataset,
     'num_classes': len(taco_dataset.class_names) + 1,
+
+    # Image Size
+    'max_size': 550,
+})
+
+yolact_resnet50_taco_2_config = yolact_resnet50_config.copy({
+    'name': 'yolact_resnet50_taco2',
+    # Dataset stuff
+    'dataset': taco_2_dataset,
+    'num_classes': len(taco_2_dataset.class_names) + 1,
 
     # Image Size
     'max_size': 550,
