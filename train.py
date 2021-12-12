@@ -324,8 +324,7 @@ def train():
                 
                 # Submit loss to wandb
                 
-                wandb.log({"Loss":loss.item()})
-                
+                wandb.log({"Loss":loss.item(),"Box":val_info['box']['all'],"Mask":val_info['mask']['all']})
                 
                 # Add the loss to the moving average for bookkeeping
                 for k in losses:
@@ -492,6 +491,7 @@ def compute_validation_loss(net, data_loader, criterion):
         print(('Validation ||' + (' %s: %.3f |' * len(losses)) + ')') % tuple(loss_labels), flush=True)
 
 def compute_validation_map(epoch, iteration, yolact_net, dataset, log:Log=None):
+    global val_info
     with torch.no_grad():
         yolact_net.eval()
         start = time.time()
@@ -499,10 +499,6 @@ def compute_validation_map(epoch, iteration, yolact_net, dataset, log:Log=None):
         print("Computing validation mAP (this may take a while)...", flush=True)
         val_info = eval_script.evaluate(yolact_net, dataset, train_mode=True)
         end = time.time()
-        
-        # Submit mAP to wandb
-        wandb.log({"Box":val_info['box']['all']})
-        wandb.log({"Mask":val_info['mask']['all']})
         
         if log is not None:
             log.log('val', val_info, elapsed=(end - start), epoch=epoch, iter=iteration)
