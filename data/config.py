@@ -54,6 +54,26 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   62: 57, 63: 58, 64: 59, 65: 60, 67: 61, 70: 62, 72: 63, 73: 64,
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
+
+TACO_CLASSES = ("Aerosol", "Aluminium foil", "Battery", "Aluminium blister pack", 
+                "Carded blister pack", "Clear plastic botte", "Glass bottle", 
+                "Other plastic bottle", "Plastic bottle cap", "Metal bottle cap", 
+                "Broken glass", "Drink can", "Food Can", "Corrugated carton", 
+                "Drink carton", "Egg carton", "Meal carton", "Other carton",
+                "Paper cup", "Disposable plastic cup", "Foam cup", "Glass cup", 
+                "Other plastic cup", "Food waste", "Plastic lid", "Metal lid", 
+                "Magazine paper", "Tissues", "Wrapping paper", "Normal paper", 
+                "Paper bag", "Plastified paper bag", "Pizza box", "Garbage bag", 
+                "Single-use carrier bag", "Polypropylene bag", "Produce bag", 
+                "Cereal bag", "Bread bag", "Plastic film", "Crisp packet", 
+                "Other plastic wrapper", "Retort pouch", "Spread tub", "Tupperware", 
+                "Disposable food container", "Foam food container", 
+                "Other plastic container", "Plastic glooves", "Plastic utensils", 
+                "Pop tab", "Rope & strings", "Scrap metal", "Shoe", 
+                "Six pack rings", "Squeezable tube", "Plastic straw", "Paper straw", 
+                "Styrofoam piece", "Toilet tube", "Unlabeled litter", "Glass jar", 
+                "Other plastic", "Cigarette")
+
 KELAPA_MAP = COCO_LABEL_MAP
 for x in range(1,5):
   KELAPA_MAP[x+91] = x+80
@@ -200,6 +220,15 @@ kelapa_sawit_3_dataset = dataset_base.copy({
   'valid_info': './data/KelapaSawit3/KelapaVal/KelapaAnnotationVal.json',
   'valid_images': './data/KelapaSawit2/KelapaVal/ImageKelapaVal/',
   'class_names': ('FFB_Accept','FFB_Med_High','FFB_Med_Low','FFB_Reject')
+})
+
+taco_dataset = dataset_base.copy({
+  'name': 'Emmerich Research Center - TACO',
+  'train_info': '../../TACO/data/annotations_0_test.json',
+  'train_images': '../../TACO/data',
+  'valid_info': '../../TACO/data/annotations_0_val.json',
+  'valid_images': '../../TACO/data',
+  'class_names': TACO_CLASSES
 })
 
 
@@ -838,6 +867,16 @@ yolact_resnet50_kelapa_sawit_3_config = yolact_resnet50_config.copy({
     # Dataset stuff
     'dataset': kelapa_sawit_3_dataset,
     'num_classes': len(kelapa_sawit_3_dataset.class_names) + 1,
+
+    # Image Size
+    'max_size': 550,
+})
+
+yolact_resnet50_taco_config = yolact_resnet50_config.copy({
+    'name': 'yolact_resnet50_taco',
+    # Dataset stuff
+    'dataset': taco_dataset,
+    'num_classes': len(taco_dataset.class_names) + 1,
 
     # Image Size
     'max_size': 550,
