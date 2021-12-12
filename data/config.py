@@ -55,24 +55,21 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
 
-TACO_CLASSES = ("Aerosol", "Aluminium foil", "Battery", "Aluminium blister pack", 
-                "Carded blister pack", "Clear plastic botte", "Glass bottle", 
-                "Other plastic bottle", "Plastic bottle cap", "Metal bottle cap", 
-                "Broken glass", "Drink can", "Food Can", "Corrugated carton", 
-                "Drink carton", "Egg carton", "Meal carton", "Other carton",
-                "Paper cup", "Disposable plastic cup", "Foam cup", "Glass cup", 
-                "Other plastic cup", "Food waste", "Plastic lid", "Metal lid", 
-                "Magazine paper", "Tissues", "Wrapping paper", "Normal paper", 
-                "Paper bag", "Plastified paper bag", "Pizza box", "Garbage bag", 
-                "Single-use carrier bag", "Polypropylene bag", "Produce bag", 
-                "Cereal bag", "Bread bag", "Plastic film", "Crisp packet", 
-                "Other plastic wrapper", "Retort pouch", "Spread tub", "Tupperware", 
-                "Disposable food container", "Foam food container", 
-                "Other plastic container", "Plastic glooves", "Plastic utensils", 
-                "Pop tab", "Rope & strings", "Scrap metal", "Shoe", 
-                "Six pack rings", "Squeezable tube", "Plastic straw", "Paper straw", 
-                "Styrofoam piece", "Toilet tube", "Unlabeled litter", "Glass jar", 
-                "Other plastic", "Cigarette")
+TACO_CLASSES = ("Aluminium foil", "Battery", "Aluminium blister pack", 
+                "Carded blister pack", "Other plastic bottle", "Clear plastic botte", 
+                "Glass bottle", "Plastic bottle cap", "Metal bottle cap", 
+                "Broken glass", "Food Can", "Aerosol", "Drink can", "Toilet tube",
+                "Other carton", "Egg carton", "Drink carton", "Corrugated carton",
+                "Meal carton", "Pizza box", "Paper cup", "Disposable plastic cup",
+                "Foam cup", "Glass cup", "Other plastic cup", "Food waste", "Glass jar",
+                "Plastic lid", "Metal lid", "Other plastic", "Magazine paper", "Tissues", 
+                "Wrapping paper", "Normal paper", "Paper bag", "Plastified paper bag",
+                "Plastic film", "Six pack rings", "Garbage bag", "Other plastic wrapper",
+                "Single-use carrier bag", "Polypropylene bag", "Crisp packet", "Spread tub", 
+                "Tupperware", "Disposable food container", "Foam food container", 
+                "Other plastic container", "Plastic glooves", "Plastic utensils", "Pop tab", 
+                "Rope & strings", "Scrap metal", "Shoe", "Squeezable tube", "Plastic straw", 
+                "Paper straw", "Styrofoam piece", "Unlabeled litter", "Cigarette")
 
 KELAPA_MAP = COCO_LABEL_MAP
 for x in range(1,5):
