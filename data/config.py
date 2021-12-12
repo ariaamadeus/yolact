@@ -224,12 +224,13 @@ kelapa_sawit_3_dataset = dataset_base.copy({
 
 taco_dataset = dataset_base.copy({
   'name': 'Emmerich Research Center - TACO',
-  'train_info': '../../TACO/data/annotations_0_test.json',
-  'train_images': '../../TACO/data',
-  'valid_info': '../../TACO/data/annotations_0_val.json',
-  'valid_images': '../../TACO/data',
+  'train_info': '/content/TACO/data/annotations_0_train.json',
+  'train_images': '/content/TACO/data',
+  'valid_info': '/content/TACO/data/annotations_0_val.json',
+  'valid_images': '/content/TACO/data',
   'class_names': TACO_CLASSES
 })
+
 
 
 # ----------------------- TRANSFORMS ----------------------- #
