@@ -172,7 +172,7 @@ class CustomDataParallel(nn.DataParallel):
         return out
 
 def train():
-    global loss
+    global loss, val_info
     if not os.path.exists(args.save_folder):
         os.mkdir(args.save_folder)
 
@@ -322,7 +322,7 @@ def train():
                 if torch.isfinite(loss).item():
                     optimizer.step()
                 
-                # Submit loss to wandb
+                # Submit to wandb
                 
                 wandb.log({"Loss":loss.item(),"Box":val_info['box']['all'],"Mask":val_info['mask']['all']})
                 
