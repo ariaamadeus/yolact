@@ -157,7 +157,15 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
         if cfg.eval_mask_branch:
             # Masks are drawn on the GPU, so don't copy
             masks = t[3][idx]
+        #classes, scores, boxes = [None, None, None]
         classes, scores, boxes = [x[idx].cpu().numpy() for x in t[:3]]
+        #print(classes, scores, boxes)
+        #if len(classes) == 0:
+            #classes = np.array([0])
+        #if len(scores) == 0:
+            #scores = np.array([0])
+        #if len(boxes) == 0:
+            #boxes = np.array([0])
 
     num_dets_to_consider = min(args.top_k, classes.shape[0])
     for j in range(num_dets_to_consider):
@@ -259,7 +267,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
                 cv2.putText(img_numpy, text_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
             
     
-    return img_numpy
+    return img_numpy, classes, scores, boxes
 
 def prep_benchmark(dets_out, h, w):
     with timer.env('Postprocess'):
@@ -592,20 +600,56 @@ def badhash(x):
     x =  ((x >> 16) ^ x) & 0xFFFFFFFF
     return x
 
-def evalimage(net:Yolact, path:str, save_path:str=None):
+globclasses = []
+globscores = []
+globboxes = []
+
+def evalimageSock(net:Yolact, camFeed, ifinit = False, save_path:str=None):
+    global globclasses, globscores, globboxes
+    frame = torch.from_numpy(camFeed).cuda().float()
+    batch = FastBaseTransform()(frame.unsqueeze(0))
+    preds = net(batch)
+
+    if ifinit:
+        img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
+    else:
+        img_numpy, classes, scores, boxes = prep_display(preds, frame, None, None, undo_transform=False)
+
+        globclasses.append(classes)
+        globscores.append(scores)
+        globboxes.append(boxes)
+    
+    if save_path is None:
+        pass
+        #img_numpy = img_numpy[:, :, (2, 1, 0)]
+
+    if save_path is None:
+        pass
+	#plt.imshow(img_numpy)
+        #plt.title(path)
+        #plt.show()
+    else:
+        cv2.imwrite(save_path, img_numpy)
+
+def evalimage(net:Yolact, path:str, save_path:str=None, ifinit = False):
     frame = torch.from_numpy(cv2.imread(path)).cuda().float()
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
-    img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
-    
-    if save_path is None:
-        img_numpy = img_numpy[:, :, (2, 1, 0)]
+    if ifinit:
+        img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
+    else:
+        img_numpy, classes, scores, boxes = prep_display(preds, frame, None, None, undo_transform=False)
 
     if save_path is None:
-        plt.imshow(img_numpy)
-        plt.title(path)
-        plt.show()
+        pass
+        #img_numpy = img_numpy[:, :, (2, 1, 0)]
+
+    if save_path is None:
+        pass
+	#plt.imshow(img_numpy)
+        #plt.title(path)
+        #plt.show()
     else:
         cv2.imwrite(save_path, img_numpy)
 
@@ -621,13 +665,13 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             name = '.'.join(name.split('.')[:-1]) + '.png'
             out_path = os.path.join(output_folder, name)
 
-            evalimage(net, path, out_path)
+            evalimage(net, path, save_path = out_path)
             print(path + ' -> ' + out_path)
         print('Done')
-        while not againTrue:
-            again = input("New image?([y]/n)")
+        while True:
+            again = input("New image?(y/n)")
             if again.isidentifier():
-                if again.casefold() == 'y' or again.casefold() == 'yes' or again == '':
+                if again.casefold() == 'y' or again.casefold() == 'yes':
                     again = 'y'
                     break
                 elif again.casefold() == 'n' or again.casefold() == 'no':
@@ -641,7 +685,7 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             continue
         else:
             break
-    print('Closing.')
+    print('Closing...')
 
 from multiprocessing.pool import ThreadPool
 from queue import Queue
@@ -1063,7 +1107,98 @@ def print_maps(all_maps):
     print(make_sep(len(all_maps['box']) + 1))
     print()
 
+net = 0
+dataset = 0
 
+def theInit(trained_model, config, ifinit = False, cuda = True):
+    global net, dataset
+
+    parse_args()
+
+    args.trained_model = trained_model
+    args.score_threshold = 1
+    args.top_k = 100
+    args.config = config
+    args.cuda = cuda
+
+    # a blank image for initial load model
+    args.image = (np.ndarray((2000, 2000, 3), dtype=int)).astype(np.uint8)
+
+    if args.config is not None:
+        set_cfg(args.config)
+
+    if args.trained_model == 'interrupt':
+        args.trained_model = SavePath.get_interrupt('weights/')
+    elif args.trained_model == 'latest':
+        args.trained_model = SavePath.get_latest('weights/', cfg.name)
+
+    if args.config is None:
+        model_path = SavePath.from_str(args.trained_model)
+        # TODO: Bad practice? Probably want to do a name lookup instead.
+        args.config = model_path.model_name + '_config'
+        print('Config not specified. Parsed %s from the file name.\n' % args.config)
+        set_cfg(args.config)
+
+    if args.detect:
+        cfg.eval_mask_branch = False
+
+    if args.dataset is not None:
+        set_dataset(args.dataset)
+
+    with torch.no_grad():
+        if not os.path.exists('results'):
+            os.makedirs('results')
+
+        if args.cuda:
+            cudnn.fastest = True
+            torch.set_default_tensor_type('torch.cuda.FloatTensor')
+        else:
+            torch.set_default_tensor_type('torch.FloatTensor')
+
+        if args.resume and not args.display:
+            with open(args.ap_data_file, 'rb') as f:
+                ap_data = pickle.load(f)
+            calc_map(ap_data)
+            exit()
+
+        dataset = COCODetection(cfg.dataset.valid_images, cfg.dataset.valid_info,
+                                transform=BaseTransform(), has_gt=cfg.dataset.has_gt)
+        prep_coco_cats()    
+
+        print('Loading model...', end='')
+        net = Yolact()
+        net.load_weights(args.trained_model)
+        net.eval()
+        print(' Done.')
+
+        if args.cuda:
+            net = net.cuda()
+        net.detect.use_fast_nms = args.fast_nms
+        net.detect.use_cross_class_nms = args.cross_class_nms
+        cfg.mask_proto_debug = args.mask_proto_debug
+        evalimageSock(net, args.image, ifinit)
+
+def outEval(score_threshold, top_k, image, cuda = True):
+    global globclasses, globscores, globboxes, net, dataset
+
+    s_t =time.time()
+    parse_args()
+    args.score_threshold = score_threshold
+    args.top_k = top_k
+    args.image = image
+    args.cuda = cuda
+
+    with torch.no_grad():
+        if args.cuda:
+            net = net.cuda()
+
+        globclasses = []
+        globscores = []
+        globboxes = []
+        evalimageSock(net, args.image)
+        print("time_taken",time.time()-s_t)
+
+    return globclasses, globscores, globboxes
 
 if __name__ == '__main__':
     parse_args()
